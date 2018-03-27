@@ -39,7 +39,8 @@
 (global-set-key (kbd "<f12> F") 'magit-fetch-all-prune)
 (global-set-key (kbd "<f12> l") 'magit-log-all)
 (global-set-key (kbd "<f12> p") 'magit-pull)
-(global-set-key (kbd "<f12> R") 'magit-rebase)
+(global-set-key (kbd "<f12> r") 'magit-rebase)
+(global-set-key (kbd "<f12> R") 'magit-reset-hard)
 (global-set-key (kbd "<f12> d") 'magit-branch-delete)
 
 (defun git-status-or-vc-dir ()
