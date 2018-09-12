@@ -35,6 +35,7 @@
              (compile (format "%s %s" bf root))
            (message "%s %s" bf "not found"))))
      (define-key projectile-mode-map (kbd "C-o m") 'helm-make-projectile)
-     (define-key projectile-mode-map (kbd "M-s M-u") 'helm-projectile-grep)))
+     (define-key projectile-mode-map (kbd "M-s M-u") 'helm-projectile-grep)
+     (define-key projectile-mode-map (kbd "C-c p h") 'helm-projectile)))
 
 (provide 'projectile-settings)
