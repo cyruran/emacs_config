@@ -45,6 +45,12 @@
   "#!/bin/bash\n"
   "\n")
 
+(define-skeleton skeleton-python
+  "Skeleton for python scripts"
+  ""
+  "#!/usr/bin/env python\n"
+  "\n")
+
 (defun apply-skeletons ()
   (message "Extention %s" (file-name-extension (buffer-file-name)))
   (let ((file-ext (file-name-extension (buffer-file-name))))
@@ -52,7 +58,8 @@
      ((string-equal file-ext "pl") (skeleton-perl))
      ((string-equal file-ext "t") (skeleton-perl-test))
      ((string-equal file-ext "pm") (skeleton-perl-module))
-     ((string-equal file-ext "sh") (skeleton-bash)))))
+     ((string-equal file-ext "sh") (skeleton-bash))
+     ((string-equal file-ext "py") (skeleton-bash)))))
 
 (add-to-list 'find-file-not-found-functions 'apply-skeletons)
 
