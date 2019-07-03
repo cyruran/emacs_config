@@ -172,6 +172,8 @@
 
 (require 'skeletons)
 
+(require 'komi-input)
+
 ;; (require 'chords)
 
 (provide 'common)
