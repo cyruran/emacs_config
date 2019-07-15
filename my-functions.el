@@ -14,13 +14,18 @@
 (global-set-key (kbd "M-s-<up>") 'windmove-up)
 (global-set-key (kbd "M-s-<down>") 'windmove-down)
 
+(global-set-key (kbd "M-s-j") 'windmove-left)
+(global-set-key (kbd "M-s-;") 'windmove-right)
+(global-set-key (kbd "M-s-l") 'windmove-up)
+(global-set-key (kbd "M-s-k") 'windmove-down)
+
 (global-set-key (kbd "C-o i") 'imenu)
 
 (global-set-key (kbd "M-s-e") (lambda () (interactive) (eshell t)))
 (global-set-key (kbd "M-s-s") (lambda () (interactive) (shell t)))
 
 (global-set-key (kbd "M-s M-o") (lambda () (interactive) (occur (current-word))))
-(global-set-key (kbd "C-M-j") 'ace-jump-mode)
+(global-set-key (kbd "C-M-j") 'ace-jump-char-mode)
 (global-set-key (kbd "C-M-S-j") 'ace-jump-helm-line)
 
 (setq my-filename-parameter (lambda () (read-file-name "File name: " (file-name-directory (buffer-file-name)) (file-name-nondirectory (buffer-file-name)) nil nil nil)))

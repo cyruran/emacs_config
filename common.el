@@ -30,6 +30,10 @@
         (insert key1))
     (insert key)))
 
+(defun my:magit-reset-hard (commit)
+  (interactive (list (magit-read-branch-or-commit "Hard reset to" (concat "origin/" (magit-get-current-branch)))))
+  (magit-reset-internal "--hard" commit))
+
 (global-set-key (kbd "\"") (lambda () (interactive) (smart-quote "\"" "\"")))
 
 (global-set-key (kbd "<f12> s") 'magit-status)
@@ -40,7 +44,7 @@
 (global-set-key (kbd "<f12> l") 'magit-log-all)
 (global-set-key (kbd "<f12> p") 'magit-pull)
 (global-set-key (kbd "<f12> r") 'magit-rebase)
-(global-set-key (kbd "<f12> R") 'magit-reset-hard)
+(global-set-key (kbd "<f12> R") 'my:magit-reset-hard)
 (global-set-key (kbd "<f12> d") 'magit-branch-delete)
 
 (defun git-status-or-vc-dir ()
@@ -82,7 +86,7 @@
 (setq-default indent-tabs-mode nil)
 
 ;; (set-frame-font "Hack 13" nil t)
-(set-face-attribute 'default nil :height 130)
+(set-face-attribute 'default nil :height 120)
 
 ;; (powerline-default-theme)
 
