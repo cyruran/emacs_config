@@ -59,7 +59,7 @@
      ((string-equal file-ext "t") (skeleton-perl-test))
      ((string-equal file-ext "pm") (skeleton-perl-module))
      ((string-equal file-ext "sh") (skeleton-bash))
-     ((string-equal file-ext "py") (skeleton-bash)))))
+     ((string-equal file-ext "py") (skeleton-python)))))
 
 (add-to-list 'find-file-not-found-functions 'apply-skeletons)
 
