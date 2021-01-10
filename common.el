@@ -2,7 +2,8 @@
 (setq package-archives
       (quote (("gnu" . "http://elpa.gnu.org/packages/")
           ("melpa" . "https://melpa.org/packages/")
-          ("marmalade" . "http://marmalade-repo.org/packages/"))))
+          ;; ("marmalade" . "http://marmalade-repo.org/packages/")
+          )))
 
 (package-initialize)
 
