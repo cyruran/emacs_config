@@ -8,6 +8,9 @@
 (package-initialize)
 
 (global-unset-key "\C-o")
+(global-unset-key "\C-z")
+
+(global-set-key (kbd "<XF86Favorites>") 'bookmark-jump)
 
 (defun my-dired-select-this-file ()
   (interactive)
@@ -47,6 +50,8 @@
 (global-set-key (kbd "<f12> r") 'magit-rebase)
 (global-set-key (kbd "<f12> R") 'my:magit-reset-hard)
 (global-set-key (kbd "<f12> d") 'magit-branch-delete)
+
+(global-set-key (kbd "<f12> C") 'forge-checkout-pullreq)
 
 (defun git-status-or-vc-dir ()
   (interactive)
@@ -149,6 +154,8 @@
 ;; Projectile
 (require 'projectile-settings nil t)
 
+;; (require 'term-settings nil t)
+
 ;; Custom helm
 (eval-after-load 'helm-mode
   '(defun my-helm-upload-files (candidate)
@@ -174,6 +181,32 @@
 ;; (require 'jcl-mode)
 (eval-after-load 'org-mode
   '(require 'org-word-export))
+
+(add-hook 'prog-mode-hook 'subword-mode)
+(add-hook 'typescript-mode-hook 'subword-mode)
+
+(defun replace-with-relative-path ()
+  (interactive)
+  (let ((fn (buffer-substring-no-properties (region-beginning) (region-end))))
+    (delete-region (region-beginning) (region-end))
+    (insert (file-relative-name fn))))
+
+(setq lsp-keymap-prefix "s-m")
+(require 'lsp-mode)
+(require 'lsp-python-ms)
+;; (add-hook 'python-mode-hook #'lsp-mode)
+;; (add-hook 'python-mode-hook #'(lambda () (lsp-ui-mode 0)))
+;; (add-hook 'python-mode-hook #'lsp)
+(add-hook 'python-mode-hook #'highlight-indentation-mode)
+(add-hook 'typescript-mode-hook #'lsp-mode)
+(add-hook 'typescript-mode-hook #'(lambda () (lsp-ui-mode 0)))
+(add-hook 'typescript-mode-hook #'lsp)
+
+(add-hook 'c++-mode-hook #'lsp-mode)
+(add-hook 'c++-mode-hook #'lsp)
+
+;; (add-hook 'js-mode-hook #'lsp-mode)
+;; (add-hook 'js-mode-hook #'lsp)
 
 (require 'skeletons)
 

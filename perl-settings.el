@@ -100,6 +100,24 @@
   (interactive)
   (shell-command (format "perl -c %s" (buffer-file-name))))
 
+;; REPL
+;; apt install libdevel-repl-perl
+
+(defun perl-start-repl ()
+  (interactive)
+  (or (get-buffer "*re.pl*")
+      (let ((repl (ansi-term "/bin/bash" "re.pl")))
+        (send-string repl "re.pl\n")
+        repl)))
+
+(defun perl-send-region-repl ()
+  (interactive)
+  (send-region (perl-start-repl) (region-beginning) (region-end)))
+
+(defun perl-send-buffer-perl ()
+  (interactive)
+  (send-region (perl-start-repl) (buffer-end 0) (buffer-end 1)))
+
 ;; Perl keys
 (eval-after-load 'cperl-mode
   '(progn (define-key cperl-mode-map (kbd "C-o v s") 'cperl-search-decl)
@@ -122,7 +140,8 @@
     (define-key cperl-mode-map (kbd "<f9> r") 'perltidy-region)
     (define-key cperl-mode-map (kbd "<f9> b") 'perltidy-buffer)
 
-    (define-key cperl-mode-map (kbd "M-<f5>") (lambda () (interactive) (cperl-mode)))))
+    (define-key cperl-mode-map (kbd "M-<f5>") (lambda () (interactive) (cperl-mode)))
+    (define-key cperl-mode-map (kbd "C-c C-c") (lambda () (interactive) (cperl-mode)))))
 
 (add-hook 'cperl-mode-hook
           (lambda ()

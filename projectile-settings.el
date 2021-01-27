@@ -40,6 +40,7 @@
      (define-key projectile-mode-map (kbd "C-c p s g") 'projectile-grep)
      (define-key projectile-mode-map (kbd "C-c p i") 'projectile-invalidate-cache)
      (define-key projectile-mode-map (kbd "C-c p D") 'projectile-dired)
+     (define-key projectile-mode-map (kbd "C-c p b") 'projectile-ibuffer)
      ))
 
 (provide 'projectile-settings)
