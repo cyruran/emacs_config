@@ -82,7 +82,7 @@
 (menu-bar-mode -1)
 (scroll-bar-mode -1)
 
-(setq dired-listing-switches "-lAXGh --group-directories-first")
+(setq dired-listing-switches "-lAGh --group-directories-first")
 (show-paren-mode 1)
 
 (which-function-mode 1)
