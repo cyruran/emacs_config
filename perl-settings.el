@@ -33,7 +33,7 @@
 (defun my-perl-projectile-etags ()
   (interactive)
   (cd (projectile-project-root))
-  (async-shell-command "etags `find -type f -not -name '*.*' -not -path './.git/*' -not -path './.svn/*' -o -name '*.p[lm]'`"))
+  (async-shell-command "etags --language=perl `find -type f -not -name '*.*' -not -path './.git/*' -not -path './.svn/*' -o -name '*.p[lm]'`"))
 
 (defun cperl-search-decl ()
   (interactive)

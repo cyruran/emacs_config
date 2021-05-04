@@ -1,6 +1,6 @@
 ;; My hotkeys
 (global-set-key (kbd "M-RET") 'mc/mark-next-like-this)
-(global-set-key (kbd "C-c d") 'ediff)
+;; (global-set-key (kbd "C-c d") 'ediff)
 
 (global-set-key (kbd "C-x v e") 'vc-ediff)
 
@@ -24,13 +24,17 @@
 (global-set-key (kbd "M-s-e") (lambda () (interactive) (eshell t)))
 (global-set-key (kbd "M-s-s") (lambda () (interactive) (shell t)))
 
-(global-set-key (kbd "M-s M-o") (lambda () (interactive) (occur (current-word))))
+(global-set-key (kbd "M-s M-o") (lambda ()
+                                  (interactive)
+                                  (occur
+                                   (if (use-region-p)
+                                       (buffer-substring-no-properties (region-beginning) (region-end))
+                                       (current-word)))))
 (global-set-key (kbd "C-M-j") 'ace-jump-char-mode)
 (global-set-key (kbd "C-M-S-j") 'ace-jump-helm-line)
 
 (setq my-filename-parameter (lambda () (read-file-name "File name: " (file-name-directory (buffer-file-name)) (file-name-nondirectory (buffer-file-name)) nil nil nil)))
 
-(require 'cl)
 (defmacro alambda (args &rest body)
   `(labels ((self ,args ,@body))
      #'self))
@@ -103,7 +107,7 @@
     (grep-mode)
     ))
 
-(global-set-key (kbd "C-c C-d") 'duplicate)
+;; (global-set-key (kbd "C-c C-d") 'duplicate)
 
 (global-set-key (kbd "C-@") 'er/expand-region)
 

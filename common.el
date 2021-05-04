@@ -51,7 +51,7 @@
 (global-set-key (kbd "<f12> R") 'my:magit-reset-hard)
 (global-set-key (kbd "<f12> d") 'magit-branch-delete)
 
-(global-set-key (kbd "<f12> C") 'forge-checkout-pullreq)
+;; (global-set-key (kbd "<f12> C") 'forge-checkout-pullreq)
 
 (defun git-status-or-vc-dir ()
   (interactive)
@@ -61,7 +61,7 @@
 
 (global-set-key (kbd "C-x v d") 'git-status-or-vc-dir)
 
-(require 'tap-mode)
+;; (require 'tap-mode)
 
 (setq tramp-default-method "ssh")
 
@@ -95,16 +95,6 @@
 (set-face-attribute 'default nil :height 120)
 
 ;; (powerline-default-theme)
-
-;; Org
-(global-set-key (kbd "C-c l") 'org-store-link)
-
-;; Pl-sense
-;; (require 'plsense)
-;; (setq plsense-popup-help-key "C-:")
-;; (setq plsense-jump-to-definition-key "C->")
-
-;; (plsense-config-default)
 
 ;; Ido
 ;; (ido-mode 1)
@@ -191,27 +181,8 @@
     (delete-region (region-beginning) (region-end))
     (insert (file-relative-name fn))))
 
-(setq lsp-keymap-prefix "s-m")
-(require 'lsp-mode)
-(require 'lsp-python-ms)
-;; (add-hook 'python-mode-hook #'lsp-mode)
-;; (add-hook 'python-mode-hook #'(lambda () (lsp-ui-mode 0)))
-;; (add-hook 'python-mode-hook #'lsp)
-(add-hook 'python-mode-hook #'highlight-indentation-mode)
-(add-hook 'typescript-mode-hook #'lsp-mode)
-(add-hook 'typescript-mode-hook #'(lambda () (lsp-ui-mode 0)))
-(add-hook 'typescript-mode-hook #'lsp)
-
-(add-hook 'c++-mode-hook #'lsp-mode)
-(add-hook 'c++-mode-hook #'lsp)
-
-;; (add-hook 'js-mode-hook #'lsp-mode)
-;; (add-hook 'js-mode-hook #'lsp)
-
 (require 'skeletons)
 
 (require 'komi-input)
-
-;; (require 'chords)
 
 (provide 'common)
