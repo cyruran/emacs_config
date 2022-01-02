@@ -1,5 +1,5 @@
 (mapcar (lambda (x) (or (package-installed-p x)
-			 (message "%s" x)))
+			(package-install x)))
 	'(helm
 	  s
 	  projectile
@@ -10,4 +10,5 @@
 	  expand-region
 	  solarized-theme
 	  helm-company
-	  magit))
+	  magit
+          multi-term))

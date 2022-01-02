@@ -82,7 +82,7 @@
 (menu-bar-mode -1)
 (if (commandp 'scroll-bar-mode)
     (scroll-bar-mode -1))
-(delete-selection 1)
+(delete-selection-mode 1)
 
 (setq dired-listing-switches "-alh --group-directories-first")
 (show-paren-mode 1)
