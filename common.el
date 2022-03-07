@@ -9,6 +9,7 @@
 (global-unset-key "\C-z")
 
 (setq mouse-wheel-progressive-speed nil)
+(setq parens-require-spaces nil)
 
 (global-set-key (kbd "<XF86Favorites>") 'bookmark-jump)
 
@@ -92,6 +93,7 @@
 (set-default 'tags-case-fold-search nil)
 
 (setq-default indent-tabs-mode nil)
+(setq compilation-scroll-output 1)
 
 (set-face-attribute 'default nil :height 120)
 
