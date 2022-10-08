@@ -176,9 +176,10 @@
            (switch-to-buffer my-vterm-toggle-prev)
            (next-buffer))
     (let ((prev-buffer (current-buffer)))
-      (let* ((sw_dir (if arg
-                         default-directory
-                         (or (projectile-project-root) default-directory)))
+      (let* ((sw_dir (expand-file-name
+                      (if arg
+                          default-directory
+                        (or (projectile-project-root) default-directory))))
              (buff-name (format "*vterm[%s]*" sw_dir)))
         (if (get-buffer buff-name)
             (switch-to-buffer buff-name)
