@@ -174,5 +174,6 @@
 (require 'skeletons)
 
 (require 'komi-input)
+(require 'vterm-prep)
 
 (provide 'common)
