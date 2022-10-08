@@ -8,6 +8,15 @@
 (global-unset-key "\C-o")
 (global-unset-key "\C-z")
 
+;; From customize
+(setq dired-dwim-target t)
+(setq dired-recursive-copies 'always)
+(setq dired-recursive-deletes 'always)
+(setq helm-always-two-windows t)
+(setq helm-full-frame nil)
+(setq helm-use-frame-when-more-than-two-windows nil)
+(setq helm-use-undecorated-frame-option t)
+
 (setq mouse-wheel-progressive-speed nil)
 (setq parens-require-spaces nil)
 
@@ -33,13 +42,17 @@
         (insert key)
         (goto-char (1+ end))
         (insert key1))
-    (insert key)))
+    (insert key key1)))
 
 (defun my:magit-reset-hard (commit)
   (interactive (list (magit-read-branch-or-commit "Hard reset to" (concat "origin/" (magit-get-current-branch)))))
   (magit-reset-internal "--hard" commit))
 
-(global-set-key (kbd "\"") (lambda () (interactive) (smart-quote "\"" "\"")))
+(global-set-key (kbd "\"") 'self-insert-command);; (lambda () (interactive) (smart-quote "\"" "\""))
+(global-set-key (kbd "M-\"") (lambda ()
+                               (interactive)
+                               (smart-quote "\"" "\"")
+                               (backward-char)))
 
 (global-set-key (kbd "<f12> s") 'magit-status)
 (global-set-key (kbd "<f12> c") 'magit-checkout)
@@ -174,7 +187,26 @@
     (insert (file-relative-name fn))))
 
 (require 'skeletons)
+(setq vterm-keymap-exceptions '("C-c" "C-x" "C-h" "M-x" "M-o" "M-y" "C-b" "M-w" "C-b" "M-v" "C-v"))
 
+(require 'vterm)
+
+(define-key vterm-mode-map (kbd "C-c") 'vterm--self-insert)
+
+(define-key vterm-mode-map (kbd "C-b C-l")             #'vterm-clear-scrollback)
+(define-key vterm-mode-map (kbd "C-b C-r")             #'vterm-reset-cursor-point)
+(define-key vterm-mode-map (kbd "C-b C-n")             #'vterm-next-prompt)
+(define-key vterm-mode-map (kbd "C-b C-p")             #'vterm-previous-prompt)
+(define-key vterm-mode-map (kbd "C-b C-t")             #'vterm-copy-mode)
+(define-key vterm-mode-map (kbd "C-b C-y")             #'vterm-yank-primary)
+(define-key vterm-mode-map [mouse-2]                   (lambda ()
+                                                         (interactive)
+                                                         (deactivate-mark)
+                                                         (vterm-yank-primary)))
+
+(define-key vterm-copy-mode-map " " #'scroll-up-command)
+(define-key vterm-copy-mode-map (kbd "<backspace>") #'scroll-down-command)
 (require 'komi-input)
+(require 'vterm-prep)
 
 (provide 'common)
