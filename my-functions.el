@@ -190,5 +190,14 @@
             (make-local-variable 'my-vterm-toggle-prev)))
         (setq my-vterm-toggle-prev prev-buffer)))))
 
+(defun my-vterm-detach ()
+  (interactive)
+  (when (and (boundp 'my-vterm-toggle-prev) my-vterm-toggle-prev)
+    (progn
+      (setq my-vterm-toggle-prev nil)
+      (rename-buffer (concat (buffer-name) "[detached]") t))))
+
 (global-set-key (kbd "M-<f3>") 'my-vterm-toggle)
+(global-set-key (kbd "M-<f2>") 'vterm)
+
 (provide 'my-functions)
