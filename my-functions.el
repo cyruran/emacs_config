@@ -169,4 +169,24 @@
       (goto-char sec-start)
       (yank))))
 
+(defun my-vterm-toggle (arg)
+  (interactive "P")
+  (if (eq major-mode 'vterm-mode)
+      (if my-vterm-toggle-prev
+           (switch-to-buffer my-vterm-toggle-prev)
+           (next-buffer))
+    (let ((prev-buffer (current-buffer)))
+      (let* ((sw_dir (if arg
+                         default-directory
+                         (or (projectile-project-root) default-directory)))
+             (buff-name (format "*vterm[%s]*" sw_dir)))
+        (if (get-buffer buff-name)
+            (switch-to-buffer buff-name)
+          (progn
+            (cd sw_dir)
+            (vterm buff-name)
+            (make-local-variable 'my-vterm-toggle-prev)))
+        (setq my-vterm-toggle-prev prev-buffer)))))
+
+(global-set-key (kbd "M-<f3>") 'my-vterm-toggle)
 (provide 'my-functions)
