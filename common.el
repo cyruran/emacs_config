@@ -32,13 +32,17 @@
         (insert key)
         (goto-char (1+ end))
         (insert key1))
-    (insert key)))
+    (insert key key1)))
 
 (defun my:magit-reset-hard (commit)
   (interactive (list (magit-read-branch-or-commit "Hard reset to" (concat "origin/" (magit-get-current-branch)))))
   (magit-reset-internal "--hard" commit))
 
-(global-set-key (kbd "\"") (lambda () (interactive) (smart-quote "\"" "\"")))
+(global-set-key (kbd "\"") 'self-insert-command);; (lambda () (interactive) (smart-quote "\"" "\""))
+(global-set-key (kbd "M-\"") (lambda ()
+                               (interactive)
+                               (smart-quote "\"" "\"")
+                               (backward-char)))
 
 (global-set-key (kbd "<f12> s") 'magit-status)
 (global-set-key (kbd "<f12> c") 'magit-checkout)
