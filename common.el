@@ -172,7 +172,25 @@
     (insert (file-relative-name fn))))
 
 (require 'skeletons)
+(setq vterm-keymap-exceptions '("C-c" "C-x" "C-h" "M-x" "M-o" "M-y" "C-b" "M-w" "C-b" "M-v" "C-v"))
 
+(require 'vterm)
+
+(define-key vterm-mode-map (kbd "C-c") 'vterm--self-insert)
+
+(define-key vterm-mode-map (kbd "C-b C-l")             #'vterm-clear-scrollback)
+(define-key vterm-mode-map (kbd "C-b C-r")             #'vterm-reset-cursor-point)
+(define-key vterm-mode-map (kbd "C-b C-n")             #'vterm-next-prompt)
+(define-key vterm-mode-map (kbd "C-b C-p")             #'vterm-previous-prompt)
+(define-key vterm-mode-map (kbd "C-b C-t")             #'vterm-copy-mode)
+(define-key vterm-mode-map (kbd "C-b C-y")             #'vterm-yank-primary)
+(define-key vterm-mode-map [mouse-2]                   (lambda ()
+                                                         (interactive)
+                                                         (deactivate-mark)
+                                                         (vterm-yank-primary)))
+
+(define-key vterm-copy-mode-map " " #'scroll-up-command)
+(define-key vterm-copy-mode-map (kbd "<backspace>") #'scroll-down-command)
 (require 'komi-input)
 (require 'vterm-prep)
 
