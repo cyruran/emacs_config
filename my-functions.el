@@ -172,14 +172,15 @@
 (defun my-vterm-toggle (arg)
   (interactive "P")
   (if (eq major-mode 'vterm-mode)
-      (if my-vterm-toggle-prev
-           (switch-to-buffer my-vterm-toggle-prev)
-           (next-buffer))
+      (if (and (boundp 'my-vterm-toggle-prev) my-vterm-toggle-prev)
+          (switch-to-buffer my-vterm-toggle-prev)
+        (message "No associated buffer"))
     (let ((prev-buffer (current-buffer)))
       (let* ((sw_dir (expand-file-name
                       (if arg
-                          default-directory
-                        (or (projectile-project-root) default-directory))))
+                          (or dired-directory
+                              default-directory)
+                        (or (projectile-project-root) dired-directory default-directory))))
              (buff-name (format "*vterm[%s]*" sw_dir)))
         (if (get-buffer buff-name)
             (switch-to-buffer buff-name)
