@@ -8,7 +8,17 @@
 (global-unset-key "\C-o")
 (global-unset-key "\C-z")
 
+;; From customize
+(setq dired-dwim-target t)
+(setq dired-recursive-copies 'always)
+(setq dired-recursive-deletes 'always)
+(setq helm-always-two-windows t)
+(setq helm-full-frame nil)
+(setq helm-use-frame-when-more-than-two-windows nil)
+(setq helm-use-undecorated-frame-option t)
+
 (setq mouse-wheel-progressive-speed nil)
+(setq parens-require-spaces nil)
 
 (global-set-key (kbd "<XF86Favorites>") 'bookmark-jump)
 
