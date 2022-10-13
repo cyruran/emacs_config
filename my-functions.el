@@ -197,6 +197,11 @@
       (setq my-vterm-toggle-prev nil)
       (rename-buffer (concat (buffer-name) "[detached]") t))))
 
+(defun my-dired-open-externally ()
+  (interactive)
+  (dolist (fn (dired-get-marked-files))
+    (start-process (concat "open-filename " fn) nil "xdg-open" fn)))
+
 (global-set-key (kbd "M-<f3>") 'my-vterm-toggle)
 (global-set-key (kbd "M-<f2>") 'vterm)
 
