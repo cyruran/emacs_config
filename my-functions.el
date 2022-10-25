@@ -177,11 +177,12 @@
         (message "No associated buffer"))
     (let ((prev-buffer (current-buffer)))
       (let* ((sw_dir (expand-file-name
-                      (if arg
-                          (or dired-directory
-                              default-directory)
-                        (or (projectile-project-root) dired-directory default-directory))))
+                      (or (unless arg (projectile-project-root))
+                          dired-directory
+                          (file-name-directory (buffer-file-name))
+                          default-directory)))
              (buff-name (format "*vterm[%s]*" sw_dir)))
+        (message "sw_dir %s" (unless arg (projectile-project-root)))
         (if (get-buffer buff-name)
             (switch-to-buffer buff-name)
           (progn
@@ -201,6 +202,13 @@
   (interactive)
   (dolist (fn (dired-get-marked-files))
     (start-process (concat "open-filename " fn) nil "xdg-open" fn)))
+
+(defun xdg-open-selection (start end)
+  (interactive "r")
+  (let ((word (if (use-region-p)
+                  (buffer-substring start end)
+                (thing-at-point 'word))))
+    (start-process "" nil "xdg-open" word)))
 
 (global-set-key (kbd "M-<f3>") 'my-vterm-toggle)
 (global-set-key (kbd "M-<f2>") 'vterm)

@@ -189,16 +189,27 @@
 (require 'skeletons)
 (setq vterm-keymap-exceptions '("C-c" "C-x" "C-h" "M-x" "M-o" "M-y" "C-b" "M-w" "C-b" "M-v" "C-v"))
 
+(setq tab-width 4)
+
+(define-key dired-mode-map (kbd "<mouse-3>") #'dired-mouse-find-file)
+
 (require 'vterm)
 
 (define-key vterm-mode-map (kbd "C-c") 'vterm--self-insert)
 
+(define-key vterm-mode-map (kbd "C-b C-b")             #'vterm-send-C-b)
+(define-key vterm-mode-map (kbd "C-b C-u")             #'universal-argument)
 (define-key vterm-mode-map (kbd "C-b C-l")             #'vterm-clear-scrollback)
 (define-key vterm-mode-map (kbd "C-b C-r")             #'vterm-reset-cursor-point)
 (define-key vterm-mode-map (kbd "C-b C-n")             #'vterm-next-prompt)
 (define-key vterm-mode-map (kbd "C-b C-p")             #'vterm-previous-prompt)
 (define-key vterm-mode-map (kbd "C-b C-t")             #'vterm-copy-mode)
 (define-key vterm-mode-map (kbd "C-b C-y")             #'vterm-yank-primary)
+(define-key vterm-mode-map (kbd "C-b C-c")             #'vterm-reset-cursor-point)
+(define-key vterm-mode-map (kbd "C-b C-r")             (lambda ()
+                                                         (interactive)
+                                                         (vterm-copy-mode t)
+                                                         (isearch-backward)))
 (define-key vterm-mode-map [mouse-2]                   (lambda ()
                                                          (interactive)
                                                          (deactivate-mark)
