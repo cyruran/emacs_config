@@ -191,6 +191,7 @@
 
 (setq tab-width 4)
 
+(require 'dired)
 (define-key dired-mode-map (kbd "<mouse-3>") #'dired-mouse-find-file)
 
 (require 'vterm)
