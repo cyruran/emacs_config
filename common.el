@@ -9,6 +9,12 @@
   (interactive)
   (setenv "PATH" (s-chomp (shell-command-to-string "bash -c '. ~/.bashrc; echo $PATH'"))))
 
+(defun copy-gdb-file-ref ()
+  (interactive)
+  (kill-new (format "%s:%s"
+                    (file-name-nondirectory (buffer-file-name))
+                    (line-number-at-pos))))
+
 (global-unset-key "\C-o")
 (global-unset-key "\C-z")
 
