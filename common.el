@@ -215,6 +215,9 @@
                                                          (interactive)
                                                          (deactivate-mark)
                                                          (vterm-yank-primary)))
+(define-key vterm-mode-map [s-mouse-1]                 (lambda (e)
+                                                         (interactive "e")
+                                                         (vterm-goto-char (nth 1 (cadr e)))))
 
 (define-key vterm-copy-mode-map " " #'scroll-up-command)
 (define-key vterm-copy-mode-map (kbd "<backspace>") #'scroll-down-command)
