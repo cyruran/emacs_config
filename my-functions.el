@@ -213,6 +213,11 @@ With ARG copies remote filename"
                 (thing-at-point 'word))))
     (start-process "" nil "xdg-open" word)))
 
+(defun project-upload ()
+  (interactive)
+  (when (boundp 'projectile-upload-target)
+    (projectile-run-async-shell-command-in-root (format "scp -r %s %s" (projectile-project-root) projectile-upload-target))))
+
 (global-set-key (kbd "M-<f3>") 'my-vterm-toggle)
 (global-set-key (kbd "M-<f2>") 'vterm)
 
