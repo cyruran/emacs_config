@@ -59,12 +59,15 @@
           it
           (gethash t myHash))))
 
-(defun copy-filename ()
-  (interactive)
+(defun copy-filename (arg)
+  "Copies local filename
+With ARG copies remote filename"
+  (interactive "P")
   (kill-new
-   (if (string= major-mode "dired-mode")
-       (mapconcat 'identity (dired-get-marked-files) " ")
-     (buffer-file-name))))
+   (funcall (if arg #'identity #'tramp-file-local-name)
+            (if (string= major-mode "dired-mode")
+                (mapconcat 'identity (dired-get-marked-files) " ")
+              (buffer-file-name)))))
 
 (eval-after-load 'cperl-mode
   '(defun my-perl-critic (cmdline)
