@@ -5,6 +5,10 @@
 
 (package-initialize)
 
+(defun set-exec-path-from-shell-PATH ()
+  (interactive)
+  (setenv "PATH" (s-chomp (shell-command-to-string "bash -c '. ~/.bashrc; echo $PATH'"))))
+
 (global-unset-key "\C-o")
 (global-unset-key "\C-z")
 
