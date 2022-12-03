@@ -256,4 +256,6 @@
 (require 'komi-input)
 (require 'vterm-prep)
 
+
+(require 'mux)
 (provide 'common)
