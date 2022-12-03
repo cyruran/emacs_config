@@ -67,7 +67,9 @@ With ARG copies remote filename"
   (kill-new
    (funcall (if arg #'identity #'tramp-file-local-name)
             (if (string= major-mode "dired-mode")
-                (mapconcat 'identity (dired-get-marked-files) " ")
+                (aif (dired-get-marked-files)
+                    (mapconcat 'identity it " ")
+                  dired-directory)
               (buffer-file-name)))))
 
 (eval-after-load 'cperl-mode
