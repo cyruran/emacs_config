@@ -39,11 +39,12 @@
   `(labels ((self ,args ,@body))
      #'self))
 
-(defmacro aif (x true false)
+(defmacro aif (x true &rest false)
+  (declare (indent 2))
   `(let ((it ,x))
      (if it
          ,true
-       ,false)))
+       ,@false)))
 
 (defmacro awhen (x true)
   `(let ((it ,x))
