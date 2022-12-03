@@ -233,6 +233,9 @@ With ARG copies remote filename"
     (projectile-run-async-shell-command-in-root (format "scp -r %s %s" (projectile-project-root) projectile-upload-target))))
 
 (global-set-key (kbd "M-<f3>") 'my-vterm-toggle)
-(global-set-key (kbd "M-<f2>") 'vterm)
+(global-set-key (kbd "M-<f2>") (lambda (arg)
+                                 (interactive "P")
+                                 (let ((default-directory (expand-file-name "~")))
+                                   (vterm arg))))
 
 (provide 'my-functions)
