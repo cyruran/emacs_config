@@ -227,7 +227,31 @@ With ARG copies remote filename"
                 (thing-at-point 'word))))
     (start-process "" nil "xdg-open" word)))
 
-(defun project-upload ()
+(defun project-upload (arg)
+  (interactive "P")
+  ;; (when (and (boundp 'projectile-upload-host)
+  ;;            (boundp 'projectile-upload-dir))
+  (let* ((proj-root (projectile-project-root))
+         (upload-host (if (boundp 'projectile-upload-host)
+                          projectile-upload-host
+                        (read-string "Hostname: ")))
+         (target-dir (concat (if (boundp 'projectile-upload-dir)
+                                 projectile-upload-dir
+                               (read-string "Upload dir: ")) "/"
+                               (or (if (boundp 'projectile-upload-target)
+                                       projectile-upload-target)
+                                   (file-name-nondirectory (directory-file-name proj-root))))))
+    (projectile-run-async-shell-command-in-root
+     (funcall (if nil
+                  (lambda (cmd)
+                    (funcall read-string "Confirm: " cmd))
+                'identity)
+              (format "rsync -aRi %s %s:%s"
+                      (if arg
+                          "[^.]*"
+                        (string-join (projectile-dir-files proj-root) " "))
+                      upload-host
+                      target-dir)))))
 
 (defun my-confirm-string-dwim (cmd)
   (read-string "Confirm: "
