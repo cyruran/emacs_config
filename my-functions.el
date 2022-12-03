@@ -175,12 +175,24 @@ With ARG copies remote filename"
       (goto-char sec-start)
       (yank))))
 
+(defun vterm/save-bare-buffer-name (&optional bn)
+  (let ((bn (or bn
+                (if (boundp 'bare-buffer-name)
+                    bare-buffer-name)
+                (buffer-name))))
+    (with-current-buffer
+        (vterm (generate-new-buffer-name bn))
+      (setq-local bare-buffer-name bn)
+      (setq-local split-width-threshold nil))))
+
 (defun my-vterm-toggle (arg)
   (interactive "P")
   (if (eq major-mode 'vterm-mode)
-      (if (and (boundp 'my-vterm-toggle-prev) my-vterm-toggle-prev)
-          (switch-to-buffer my-vterm-toggle-prev)
-        (message "No associated buffer"))
+      (if arg
+          (vterm/save-bare-buffer-name)
+        (if (and (boundp 'my-vterm-toggle-prev) my-vterm-toggle-prev)
+            (switch-to-buffer my-vterm-toggle-prev)
+          (message "No associated buffer")))
     (let ((prev-buffer (current-buffer)))
       (let* ((sw_dir (expand-file-name
                       (or (unless arg (projectile-project-root))
@@ -188,12 +200,11 @@ With ARG copies remote filename"
                           (file-name-directory (buffer-file-name))
                           default-directory)))
              (buff-name (format "*vterm[%s]*" sw_dir)))
-        (message "sw_dir %s" (unless arg (projectile-project-root)))
         (if (get-buffer buff-name)
             (switch-to-buffer buff-name)
           (progn
             (cd sw_dir)
-            (vterm buff-name)
+            (vterm/save-bare-buffer-name buff-name)
             (make-local-variable 'my-vterm-toggle-prev)))
         (setq my-vterm-toggle-prev prev-buffer)))))
 
