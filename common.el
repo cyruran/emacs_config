@@ -44,12 +44,13 @@
 (defun my-dired-select-this-file ()
   (interactive)
   (let ((full-filename (buffer-file-name)))
-    (call-interactively 'dired)
+    (dired (if full-filename
+               (file-name-directory full-filename)
+             default-directory))
     (if full-filename
-      (let ((dir (file-name-directory full-filename))
-            (filename (file-name-nondirectory full-filename)))
-        (beginning-of-buffer)
-        (search-forward-regexp (format "\\b%s\\b" filename))))))
+        (let ((filename (file-name-nondirectory full-filename)))
+          (beginning-of-buffer)
+          (search-forward-regexp (format "\\<%s\\>" filename))))))
 
 (global-set-key (kbd "C-x d") 'my-dired-select-this-file)
 
