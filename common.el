@@ -239,6 +239,18 @@
                                                          (interactive "e")
                                                          (vterm-goto-char (nth 1 (cadr e)))))
 
+(global-set-key (kbd "C-x C-l") (lambda ()
+                              (interactive)
+                              (list-buffers
+                               nil ;; OTHER-WINDOW-P
+                               "*VTerm Ibuffer*" ;; NAME
+                               '((mode . vterm-mode)) ;; QUALIFIERS
+                               nil ;; NOSELECT
+                               nil ;; SHRINK
+                               nil ;; FILTER-GROUPS
+                               '((mark name)) ;; FORMATS
+                               )))
+
 (define-key vterm-copy-mode-map " " #'scroll-up-command)
 (define-key vterm-copy-mode-map (kbd "<backspace>") #'scroll-down-command)
 (require 'komi-input)
