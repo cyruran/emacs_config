@@ -18,6 +18,15 @@
 (global-unset-key "\C-o")
 (global-unset-key "\C-z")
 
+(global-set-key (kbd "<C-s-left>") #'tab-previous)
+(global-set-key (kbd "<C-s-right>") #'tab-next)
+(global-set-key (kbd "<C-s-down>") #'tab-new)
+(global-set-key (kbd "<C-s-up>") #'tab-rename)
+(global-set-key (kbd "C-s-q") #'tab-close)
+(global-set-key [C-tab] (lambda ()
+                          (interactive)
+                          (tab-bar-select-tab (1+ (tab-bar--tab-index-recent 0)))))
+
 ;; From customize
 (setq dired-dwim-target t)
 (setq dired-recursive-copies 'always)
