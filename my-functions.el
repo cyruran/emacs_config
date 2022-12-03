@@ -228,9 +228,20 @@ With ARG copies remote filename"
     (start-process "" nil "xdg-open" word)))
 
 (defun project-upload ()
+
+(defun my-confirm-string-dwim (cmd)
+  (read-string "Confirm: "
+   (format cmd (aif (dired-dwim-target-directories)
+                   (read-string "Dwim: " (car it) nil (cdr it))
+                 ""))))
+
+(setq my--shell-history '())
+
+(defun my-run-shell-dwim ()
   (interactive)
-  (when (boundp 'projectile-upload-target)
-    (projectile-run-async-shell-command-in-root (format "scp -r %s %s" (projectile-project-root) projectile-upload-target))))
+  (shell-command
+   (my-confirm-string-dwim
+    (read-string "cmd: " nil 'my--shell-history))))
 
 (global-set-key (kbd "M-<f3>") 'my-vterm-toggle)
 (global-set-key (kbd "M-<f2>") (lambda (arg)
