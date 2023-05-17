@@ -1,7 +1,7 @@
 ;; Packages
 (setq package-archives
       (quote (("gnu" . "http://elpa.gnu.org/packages/")
-          ("melpa" . "https://melpa.org/packages/"))))
+              ("melpa" . "https://melpa.org/packages/"))))
 
 (package-initialize)
 
@@ -17,6 +17,16 @@
 
 (global-unset-key "\C-o")
 (global-unset-key "\C-z")
+
+(global-set-key (kbd "C-s-b")
+                (lambda ()
+                  (interactive)
+                  (bookmark-jump
+                   (bookmark-completing-read "Jump to bookmark") 'switch-to-buffer-other-frame)))
+(global-set-key (kbd "C-s-s")
+                (lambda ()
+                  (interactive)
+                  (switch-to-buffer-other-frame "*scratch*")))
 
 (global-set-key (kbd "<C-s-left>") #'tab-previous)
 (global-set-key (kbd "<C-s-right>") #'tab-next)
@@ -74,6 +84,13 @@
                                (smart-quote "\"" "\"")
                                (backward-char)))
 
+(global-set-key (kbd "M-<f1>") (lambda ()
+                                 (interactive)
+                                 (kill-buffer (buffer-name))
+                                 (delete-frame)))
+
+(setq magit-define-global-key-bindings nil)
+
 (global-set-key (kbd "<f12> s") 'magit-status)
 (global-set-key (kbd "<f12> c") 'magit-checkout)
 (global-set-key (kbd "<f12> b") 'magit-branch-and-checkout)
@@ -94,6 +111,19 @@
 (global-set-key (kbd "C-x v d") 'git-status-or-vc-dir)
 
 (setq tramp-default-method "ssh")
+(advice-add #'tramp-sh-handle-vc-registered :override #'ignore)
+(add-to-list 'backup-directory-alist
+              (cons tramp-file-name-regexp "/tmp/"))
+
+(defun my--plain-find-file-if-remote (orig-fun &rest args)
+  (if (string= (file-remote-p default-directory 'method) "ssh")
+      (progn
+        (message "%S" args)
+        (call-interactively #'find-file))
+    (apply orig-fun args)))
+
+(advice-add #'helm-find-files :around #'my--plain-find-file-if-remote)
+;; (advice-mapc (lambda (advice _props) (advice-remove #'helm-find-files advice)) #'helm-find-files)
 
 (defalias 'list-buffers 'ibuffer)
 ;; (defalias 'yes-or-no-p 'y-or-no-p)
@@ -109,13 +139,24 @@
 
 (defun sudo-reopen ()
   (interactive)
-  (find-file (format "/sudo::%s" (buffer-file-name))))
+  (aif (or (buffer-file-name)
+           default-directory)
+      (find-file (format "/sudo::%s" it))))
+
+(defun plain-reopen ()
+  (interactive)
+  (aif (file-remote-p (or (buffer-file-name)
+                          default-directory)
+                      'localname)
+      (find-file it)))
 
 ;; Appearance
 (tool-bar-mode -1)
 (menu-bar-mode -1)
-(if (commandp 'scroll-bar-mode)
-    (scroll-bar-mode -1))
+;; (if (commandp 'scroll-bar-mode)
+;;     (scroll-bar-mode -1))
+(setq-default scroll-bar-width 12)
+(set-window-scroll-bars (minibuffer-window) nil nil)
 (delete-selection-mode 1)
 
 (setq dired-listing-switches "-alh --group-directories-first")
@@ -131,14 +172,15 @@
 (set-face-attribute 'default nil :height 120)
 
 ;; Helm
-(require 'helm)
-(require 'helm-config)
-(helm-mode 1)
+(progn
+  (require 'helm)
+  ;; (require 'helm-config)
+  (helm-mode 1)
 
-(global-set-key (kbd "M-x") 'helm-M-x)
-(global-set-key (kbd "C-x C-f") 'helm-find-files)
+  (global-set-key (kbd "M-x") 'helm-M-x)
+  (global-set-key (kbd "C-x C-f") 'helm-find-files)
 
-(global-set-key (kbd "M-s M-i") 'helm-occur)
+  (global-set-key (kbd "M-s M-i") 'helm-occur))
 
 ;; Perl settings
 (defalias 'perl-mode 'cperl-mode)
@@ -207,7 +249,9 @@
     (insert (file-relative-name fn))))
 
 (require 'skeletons)
-(setq vterm-keymap-exceptions '("C-c" "C-x" "C-h" "M-x" "M-o" "M-y" "C-b" "M-w" "C-b" "M-v" "C-v"))
+(setq vterm-keymap-exceptions '("C-c" "C-x" "C-h" "M-x" "M-o" "M-y" "C-b" "M-w" "C-b" "M-v" "C-v" "M-:"))
+(add-hook 'vterm-mode-hook (lambda ()
+                             (local-unset-key [f12])))
 
 (setq tab-width 4)
 
@@ -235,7 +279,7 @@
                                                          (interactive)
                                                          (deactivate-mark)
                                                          (vterm-yank-primary)))
-(define-key vterm-mode-map [s-mouse-1]                 (lambda (e)
+(define-key vterm-mode-map [C-M-mouse-1]                 (lambda (e)
                                                          (interactive "e")
                                                          (vterm-goto-char (nth 1 (cadr e)))))
 
@@ -253,9 +297,29 @@
 
 (define-key vterm-copy-mode-map " " #'scroll-up-command)
 (define-key vterm-copy-mode-map (kbd "<backspace>") #'scroll-down-command)
+
+(defun incr-hex-color (arg)
+  (interactive "p")
+  (when (use-region-p)
+    (aif (buffer-substring (region-beginning) (region-end))
+         (when (string-match "\\`\\(..\\)\\(..\\)\\(..\\)\\'" it)
+           (delete-active-region)
+           (insert (string-join (mapcar (lambda (x) (format "%x" (+ (string-to-number x 16) arg)))
+                                              (list (match-string 1 it)
+                                                    (match-string 2 it)
+                                                    (match-string 3 it)))))))))
+
 (require 'komi-input)
 (require 'vterm-prep)
 
+(require 'my-work nil t)
 
-(require 'mux)
+(require 'vto)
+(require 'run-term-commands)
+
+;; (require 'mux)
+(require 'neotree-patch)
+
+(set-exec-path-from-shell-PATH)
+
 (provide 'common)

@@ -40,7 +40,13 @@
      (define-key projectile-mode-map (kbd "C-x p s g") 'projectile-grep)
      (define-key projectile-mode-map (kbd "C-x p i") 'projectile-invalidate-cache)
      (define-key projectile-mode-map (kbd "C-x p D") 'projectile-dired)
-     (define-key projectile-mode-map (kbd "C-x p b") 'projectile-ibuffer)
-     ))
+     (define-key projectile-mode-map (kbd "C-x p b") 'projectile-ibuffer)))
+
+(defun my--remote-project-p (oldfun &rest r)
+  (if (file-remote-p default-directory)
+      nil
+    (funcall oldfun r)))
+
+(advice-add #'projectile-project-p :around #'my--remote-project-p)
 
 (provide 'projectile-settings)
