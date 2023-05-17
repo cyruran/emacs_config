@@ -2,12 +2,16 @@
 
 (define-minor-mode vterm-prep-mode ""
   :keymap (list
-           (cons (kbd "C-c C-a") #'vterm-prep-send)
+           (cons (kbd "C-c C-a") #'vterm-prep-send-region-to-batch)
            (cons (kbd "C-c C-;") (lambda ()
                                    (interactive)
                                    (comment-region (point-min) (point-max))
                                    (goto-char (point-max))
                                    (newline)))
+           (cons (kbd "C-M-<return>") (lambda ()
+                                        (interactive)
+                                        (call-interactively #'duplicate)
+                                        (next-line)))
             (cons (kbd "<header-line> <mouse-3>")
                   (lambda ()
                     (interactive)
@@ -16,31 +20,63 @@
                                               (cddr (mouse-position))
                                               (car (mouse-position))))))
                       (with-current-buffer window
-                        (pop-to-buffer vterm-prep-assosiated-buffer nil t)))))
+                        (pop-to-buffer (vterm--get-associated-buffer) nil t)))))
             (cons (kbd "M-\\") #'helm-company)
             (cons (kbd "C-c C-u") #'erase-buffer)
             (cons (kbd "C-c C-k") (lambda ()
                                     (interactive)
                                     (kill-buffer (current-buffer))))
-            (cons (kbd "C-c C-c") (lambda (start end)
-                                    (interactive "r")
-                                    (vterm-prep-send
-                                     (if (use-region-p)
-                                         (buffer-substring start end)
-                                       (thing-at-point 'line t))))))
+            (cons (kbd "C-c C-c") #'vterm-prep-send-region)
+            (cons (kbd "C-c C-l") #'vterm-prep-send-region-local)
+            (cons (kbd "C-c C-v") #'vterm-prep-pop-cmd))
   :lighter "[prep]")
 
+(defun vterm-prep--construct-cmd (arg start end)
+  (funcall (aif (unless arg
+                  (awhen (gui-get-selection 'SECONDARY)
+                         `(lambda (x) (s-replace "{}" ,it x))))
+               it
+             #'identity)
+           (if (use-region-p)
+               (buffer-substring start end)
+             (thing-at-point 'line t))))
+
+(defun vterm-prep-send-region (arg start end)
+  (interactive "P\nr")
+  (if (vterm--get-associated-buffer)
+      (vterm-prep-send (vterm-prep--construct-cmd arg start end))
+    (vterm-prep-send-region-local arg start end)))
+
+(defun vterm-prep--show-local-buffer ()
+  (let ((vterm-buffer-name "*vterm-local*"))
+    (vterm--internal (lambda (buff &rest args)
+                     (select-frame-set-input-focus
+                      (window-frame (display-buffer-other-frame buff)))))))
+
+(defun vterm-prep-send-region-local (arg start end)
+  (interactive "P\nr")
+  (let ((cmd (vterm-prep--construct-cmd arg start end)))
+    (vterm-prep-send-to (vterm-prep--show-local-buffer) cmd)))
+
+(defun vterm-prep-pop-cmd (arg start end)
+  (interactive "P\nr")
+  (pop-cmd (string-chop-newline (vterm-prep--construct-cmd arg start end))))
 
 (defun vterm-prep-check-buffer-or-let-know ()
-  (if (buffer-live-p (get-buffer vterm-prep-assosiated-buffer))
+  (if (buffer-live-p (get-buffer (vterm--get-associated-buffer)))
       t
    (progn
-     (message "Terminal buffer lost" vterm-prep-assosiated-buffer)
+     (message "Terminal buffer lost" (vterm--get-associated-buffer))
      (setq header-line-format (propertize ">> DISCONNECTED" 'face '(:foreground "red")))
      nil)))
 
 (defun vterm-prep--get-cmdline ()
   (buffer-string))
+
+(defun vterm-prep-send-to (buff str)
+  (with-current-buffer buff
+    (vterm-insert (s-chomp str))
+    (vterm-send-return)))
 
 (defun vterm-prep-send (&optional string)
   (interactive)
@@ -49,11 +85,9 @@
                        (vterm-prep--get-cmdline))))
       (if (and (stringp content)
                (not (string= content "")))
-          (with-current-buffer vterm-prep-assosiated-buffer
-            (vterm-insert content)
-            (vterm-send-return))
+          (vterm-prep-send-to (vterm--get-associated-buffer) content)
         (if (vterm-prep-check-buffer-or-let-know)
-            (pop-to-buffer vterm-prep-assosiated-buffer nil t))))))
+            (pop-to-buffer (vterm--get-associated-buffer) nil t))))))
 
 (defun vterm-prep-compl-get-content ()
   (buffer-substring-no-properties (line-beginning-position) (point)))
@@ -62,7 +96,7 @@
   (when (vterm-prep-check-buffer-or-let-know)
     (let ((content vterm-prep:compl-content)
           (inhibit-quit t))
-      (with-current-buffer vterm-prep-assosiated-buffer
+      (with-current-buffer (vterm--get-associated-buffer)
         (vterm-insert content)
         (with-local-quit
           (prog1
@@ -87,6 +121,14 @@
               (setq-local vterm-prep:compl-content (vterm-prep-compl-get-content))))
     (candidates (vterm-prep-compl-gather-completions arg))
     (meta (format "This value is named %s" arg))))
+
+(defun vterm--get-associated-buffer ()
+  (or (and (boundp 'vterm-prep-assosiated-buffer)
+           vterm-prep-assosiated-buffer)
+      (and (fboundp 'pm-base-buffer)
+           (with-current-buffer (pm-base-buffer)
+             (and (boundp 'vterm-prep-assosiated-buffer)
+                  vterm-prep-assosiated-buffer)))))
 
 (defun vterm-prep--init ()
   (sh-mode)
@@ -143,6 +185,25 @@
       (newline)
       (add-text-properties (- (point) 2) (point) '(read-only t))
       (goto-char start))))
+
+(defun vterm-prep-run-more ()
+  (let ((vterm-buff (current-buffer)))
+    (aif (get-buffer (concat (buffer-name vterm-buff) "-batch"))
+        (when (> (buffer-size it) 0)
+          (with-current-buffer it
+            (vterm-prep-send-to vterm-buff (buffer-string))
+            (erase-buffer)))))
+  (message "%S" (current-buffer)))
+
+(defun vterm-prep-send-region-to-batch (arg start end)
+  (interactive "P\nr")
+  (let ((vterm-batch-buff (concat (or (vterm--get-associated-buffer)
+                                      "*vterm-local*")
+                                  "-batch"))
+        (cmd (s-chomp (vterm-prep--construct-cmd arg start end))))
+    (switch-to-buffer-other-frame vterm-batch-buff)
+    (with-current-buffer vterm-batch-buff
+      (insert cmd "\n"))))
 
 (define-key vterm-mode-map (kbd "C-x C-e")
   (lambda ()
