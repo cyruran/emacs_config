@@ -232,6 +232,7 @@ With ARG copies remote filename"
   ;; (when (and (boundp 'projectile-upload-host)
   ;;            (boundp 'projectile-upload-dir))
   (let* ((proj-root (projectile-project-root))
+         (file-list (if t '("*" ".git*") (projectile-dir-files proj-root)))
          (upload-host (if (boundp 'projectile-upload-host)
                           projectile-upload-host
                         (read-string "Hostname: ")))
@@ -249,7 +250,7 @@ With ARG copies remote filename"
               (format "rsync -aRi %s %s:%s"
                       (if arg
                           "[^.]*"
-                        (string-join (projectile-dir-files proj-root) " "))
+                        (string-join file-list " "))
                       upload-host
                       target-dir)))))
 
@@ -272,5 +273,74 @@ With ARG copies remote filename"
                                  (interactive "P")
                                  (let ((default-directory (expand-file-name "~")))
                                    (vterm arg))))
+(defun my-rgrep ()
+  (interactive)
+  ;; (setq my-rgrep-history (list (thing-at-point 'symbol t)))
+  (let ((pref "grep --color -nH --null -R . -e "))
+  (aif (read-string "Cmd: " pref nil (concat pref (thing-at-point 'symbol t)))
+      (grep it))))
+
+(defun my-rgrep ()
+  (interactive)
+  ;; (setq my-rgrep-history (list (thing-at-point 'symbol t)))
+  (let ((pref "grep --color -nH --null -R . -e "))
+  (aif (read-string "Cmd: " pref nil (concat pref (thing-at-point 'symbol t)))
+      (grep it))))
+
+(defun my-rgrep ()
+  (interactive)
+  (let ((cmd "grep --color -nH -R . -e '%s'"))
+    (aif (read-string "Search: " "" nil (thing-at-point 'symbol t))
+        (progn
+          (setq it (format cmd it))
+          (with-current-buffer (compilation-start it)
+            (rename-buffer (format "*grep: %s*" it)))))))
+
+(defun my-find ()
+  (interactive)
+  (let ((cmd "find -name '%s' -printf '%%h/%%f:0:\\n'"))
+    (aif (read-string "Glob: " "" nil (thing-at-point 'symbol t))
+        (progn
+          (setq it (format cmd it))
+          (with-current-buffer (compilation-start it)
+            (rename-buffer (format "*cmd: %s*" it)))))))
+
+(defun my-fun-in-dir (fun full-path)
+  (let ((default-directory full-path))
+    (funcall fun)))
+
+(defmacro my-neotree-fun-in-dir (fun &optional op)
+  `(lambda (full-path &optional arg)
+     (funcall (my-fun-in-dir ,fun (if ,op
+                                      (funcall ,op full-path)
+                                    full-path)))))
+
+(require 'neotree)
+(define-key neotree-mode-map (kbd "r") (neotree-make-executor
+                                        :dir-fn (my-neotree-fun-in-dir #'my-rgrep)
+                                        :file-fn (my-neotree-fun-in-dir #'my-rgrep
+                                                                        (lambda (x)
+                                                                          (file-name-directory x)))))
+
+(define-key neotree-mode-map (kbd "f") (neotree-make-executor
+                                        :dir-fn (my-neotree-fun-in-dir #'my-find)
+                                        :file-fn (my-neotree-fun-in-dir #'my-find
+                                                                        (lambda (x)
+                                                                          (file-name-directory x)))))
+
+(defun pop-cmd (cmd)
+  (interactive "MCmd: ")
+  (let ((buff-name (generate-new-buffer-name (format "*cmd! %s !*" cmd))))
+    (start-process-shell-command buff-name buff-name cmd)
+    (set-process-sentinel (get-process buff-name)
+                          (lambda (process event)
+                            (if (string= event "finished\n")
+                                (with-current-buffer (process-buffer process)
+                                  (insert "\n\n*** Successfully finished\n")
+                                  (beginning-of-buffer))
+                              (internal-default-process-sentinel process event))))
+    (display-buffer-other-frame buff-name)))
+
+;; (pop-cmd "df -h")
 
 (provide 'my-functions)
